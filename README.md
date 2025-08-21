@@ -17,7 +17,7 @@ O sistema vai analisar o IP fornecido em conjunto com a máscara e retornar:
   8. Máscara em formato CIDR e em 8 bytes;
   9. Máscara Invertida.
 
-# Função 2 - Cálcula de máscara entre dois IPs distintos
+# Função 2 - Calcula de máscara entre dois IPs distintos
 Nessa função, o usuário fornece os seguintes dados de entrada: 
   1. Dois IPs distintos em formato de 8 bytes (Ex.: "192.168.0.1");
   2. Quantidade mínima de hosts por sub-rede (caso exista);
