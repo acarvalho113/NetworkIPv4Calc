@@ -262,6 +262,7 @@ def getMaskBetweenIps():
       if addressIp1Bin[-i] == "1" == addressIp2Bin[-i]:
         dictBitsCommon[BITS_TOTAL_IPV4-i] = True
 
+  bitsHost = None
   error = len(dictBitsCommon) == 0
   if not error:
     error = True
@@ -312,7 +313,8 @@ def getMaskBetweenIps():
     print(f"{addressIp1} - Classe {classeIp1.name}")
     print(f"{addressIp2} - Classe {classeIp2.name}")
     print(f"Quantidade de Hosts solicitados: {qtdHostsRequired}")
-    print(f"Quantidade de Hosts disponíveis: {2**bitsHost}")
+    if bitsHost:
+        print(f"Quantidade de Hosts disponíveis: {2**bitsHost}")
     print("\nNão foi possível calcular uma máscara em comum entre os IPs informados!")
     pause = input("\nPressione qualquer tecla para retornar ao Menu ...")
 
