@@ -107,6 +107,14 @@ def concatStrWithDot(listParts=[]):
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #   Funções de contexto específico para endereçamentos IP   #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+def convertIpDecToBinWithDot(addressIP):
+  addressIPTupla = addressIP.split(".")
+  addressIPBin = concatStrWithDot([convertDecToBin(addressIPTupla[0], BITS_OCTETO),
+                                   convertDecToBin(addressIPTupla[1], BITS_OCTETO),
+                                   convertDecToBin(addressIPTupla[2], BITS_OCTETO),
+                                   convertDecToBin(addressIPTupla[3], BITS_OCTETO)])
+  return addressIPBin
+
 def convertIpDecToBin(addressIP):
   addressIPTupla = addressIP.split(".")
   addressIPBin = concatStr([convertDecToBin(addressIPTupla[0], BITS_OCTETO),
@@ -129,8 +137,6 @@ def convertIpBinToDec(addressIP):
   else:
     addressIP = addressIP.rjust(BITS_TOTAL_IPV4, "0")
     addressIPTupla = [addressIP[i:i+8] for i in range(0, len(addressIP), 8)]
-
-  print(f"addressIPTupla: {addressIPTupla}")
 
   addressIPDec = concatStrWithDot([convertBinToDec(addressIPTupla[0]),
                                   convertBinToDec(addressIPTupla[1]),
@@ -208,11 +214,11 @@ def detalharDadosIp(addressIp=None, bitsMask=None, maskDec=None):
     addressIp = input("Digite um endereço IPV4 com pontos separando os 4 octetos ( Ex.: 192.168.0.1 ): " )
     op = TOptionMask.Indefinido
     while op not in (TOptionMask.Inteira, TOptionMask.MaskFormat):
-      op = TOptionMask(int(input("Formato para apresentação da mascara: \n1 - Inteira \n2 - Formatada \nOpção: ")))
+      op = TOptionMask(int(input("Formato para apresentação da mascara: \n1 - CIDR (Ex.: 24)\n2 - 8 Bytes (Ex.: 255.255.255.0)\nOpção: ")))
     if op == TOptionMask.Inteira:
-      bitsMask = int(input("Digite o número inteiro correspondente a máscara do IP: " ))
+      bitsMask = int(input("Digite o número inteiro correspondente a máscara do IP, formato CIDR (Ex.: 24): " ))
     elif op == TOptionMask.MaskFormat:
-      maskDec = input("Digite a máscara do IP com pontos separando os 4 octetos ( Ex.: 255.255.255.0 ): " )
+      maskDec = input("Digite a máscara do IP com pontos separando os 4 octetos (Ex.: 255.255.255.0): " )
 
   if bitsMask:
     maskDec = getMask(bitsMask)
@@ -229,7 +235,9 @@ def detalharDadosIp(addressIp=None, bitsMask=None, maskDec=None):
   qtdHosts = 2**bitsHost
   addressBase = obterAddressIpBase(addressIp, bitsMask)
   addressRede, addressBroadcast = getDadosSubRede(bitsHost, bitsMask, addressBase, addressIp)
-  showDadosFunc1(addressIp, bitsMask, maskDec, maskDecInverse, classeIp, bitsSubRede, bitsHost, addressRede, addressBroadcast)
+  addressIPBin = convertIpDecToBinWithDot(addressIp)
+  maskBin = convertIpDecToBin(maskDec)
+  showDadosFunc1(addressIp, addressIPBin, maskBin, bitsMask, maskDec, maskDecInverse, classeIp, bitsSubRede, bitsHost, addressRede, addressBroadcast)
 
 def getMaskBetweenIps():
   addressIp1 = input("Digite o endereço IP1 com pontos separando os 4 octetos ( Ex.: 192.168.0.1 ): " )
@@ -302,6 +310,7 @@ def getMaskBetweenIps():
     addressRede2Tupla = addressRede2.split(".")
     gateway1 = concatStrWithDot(addressRede1Tupla[0:3]) + "." + str(int(addressRede1Tupla[3])+1)
     gateway2 = concatStrWithDot(addressRede2Tupla[0:3]) + "." + str(int(addressRede2Tupla[3])+1)
+    addressIpBin = 
     showDadosFunc2(addressIp1, addressIp2, classeIp1, classeIp2,
                    addressRede1, addressRede2, addressBroadcast1, addressBroadcast2,
                    bitsSubRede1, bitsSubRede2, qtdSubRedes1, qtdSubRedes2,
@@ -343,9 +352,11 @@ def showMenu():
     input()
     return showMenu
 
-def showDadosFunc1(addressIp, bitsMask, maskDec, maskDecInverse, classeIp, bitsSubRede, bitsHost, addressRede, addressBroadcast):
+def showDadosFunc1(addressIp, addressIPBin, maskBin, bitsMask, maskDec, maskDecInverse, classeIp, bitsSubRede, bitsHost, addressRede, addressBroadcast)
   clear_output()
-  print(f"Endereço IP: {addressIp}/{bitsMask} - Classe: {classeIp.name}")
+  print(f"Endereço IP Decimal: {addressIp}/{bitsMask} - Classe: {classeIp.name}")
+  print(f"Endereço IP Binário: {addressIpBin}")
+  
   print(f"\n* * Subredes * *")
   print(f"- Bits: {bitsSubRede}")
   print(f"- Quantidade: {2**bitsSubRede}")
@@ -355,19 +366,22 @@ def showDadosFunc1(addressIp, bitsMask, maskDec, maskDecInverse, classeIp, bitsS
   print(f"\n* * IPs e máscara da subrede * *")
   print(f"- IP da Rede: {addressRede}")
   print(f"- IP de Broadcast: {addressBroadcast}")
-  print(f"- Máscara: {maskDec}")
+  print(f"- Máscara Decimal: {maskDec}")
+  print(f"- Máscara Binário: {maskBin}")
   print(f"- Máscara Invertida: {maskDecInverse}")
   pause = input("\nPressione qualquer tecla para retornar ao Menu ...\n")
 
-def showDadosFunc2(addressIp1, addressIp2, classeIp1, classeIp2,
-                   addressRede1, addressRede2, addressBroadcast1, addressBroadcast2,
+def showDadosFunc2(addressIp1, addressIp2, addressIp1Bin, addressIp2Bin,
+                   classeIp1, classeIp2, addressRede1, addressRede2, addressBroadcast1, addressBroadcast2,
                    bitsSubRede1, bitsSubRede2, qtdSubRedes1, qtdSubRedes2,
-                   gateway1, gateway2, maskDec, maskDecInverse,
+                   gateway1, gateway2, maskDec, maskBin, maskDecInverse,
                    bitsMask, bitsHost, qtdHosts, qtdHostsRequired):
   clear_output()
   print(f"# Dados Originais: ")
-  print(f"- {addressIp1}   [Classe {classeIp1.name} /{classeIp1.value}]")
-  print(f"- {addressIp2}   [Classe {classeIp2.name} /{classeIp2.value}]")
+  print(f"- IP 1 Decimal: {addressIp1}   [Classe {classeIp1.name} /{classeIp1.value}]")
+  print(f"- IP 1 Binário: {addressIp1Bin}")
+  print(f"- IP 2 Decimal: {addressIp2}   [Classe {classeIp2.name} /{classeIp2.value}]")
+  print(f"- IP 2 Binário: {addressIp2Bin}")
   print(f"\n# Dados Calculados:")
   print(f"- IP: {addressIp1} /{bitsMask}")
   print(f"  IP Rede: {addressRede1}")
@@ -388,11 +402,13 @@ def showDadosFunc2(addressIp1, addressIp2, classeIp1, classeIp2,
   print(f"\n# Configuração:")
   print(f"- IP: {addressIp1} /{bitsMask}")
   print(f"  Gateway: {gateway1}")
-  print(f"  Máscara: {maskDec}")
+  print(f"  Máscara Decimal: {maskDec}")
+  print(f"  Máscara Binário: {maskBin}")
   print(f"  Máscara Invertida: {maskDecInverse}")
   print(f"- IP: {addressIp2} /{bitsMask}")
   print(f"  Gateway: {gateway2}")
-  print(f"  Máscara: {maskDec}")
+  print(f"  Máscara Decimal: {maskDec}")
+  print(f"  Máscara Binário: {maskBin}")
   print(f"  Máscara Invertida: {maskDecInverse}")
   pause = input("\nPressione qualquer tecla para retornar ao Menu ...\n")
 
